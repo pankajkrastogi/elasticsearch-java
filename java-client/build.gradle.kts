@@ -22,6 +22,16 @@ import com.github.jk1.license.render.LicenseDataCollector
 import com.github.jk1.license.render.ReportRenderer
 import java.io.FileWriter
 
+buildscript {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath("gradle.plugin.com.github.johnrengelman:shadow:7.1.1")
+    }
+}
+
 plugins {
     java
     `java-library`
@@ -29,6 +39,7 @@ plugins {
     `maven-publish`
     id("com.github.jk1.dependency-license-report") version "2.2"
     id("de.thetaphi.forbiddenapis") version "3.4"
+    id("com.github.johnrengelman.shadow") version "7.1.1"
 }
 
 java {
@@ -113,17 +124,22 @@ tasks.withType<Javadoc> {
 
 publishing {
     repositories {
+//        maven {
+//            // See https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry
+//            name = "ESJavaGithubPackages"
+//            url = uri("https://maven.pkg.github.com/elastic/elasticsearch-java")
+//            credentials(PasswordCredentials::class)
+//        }
+
         maven {
-            // See https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry
-            name = "ESJavaGithubPackages"
-            url = uri("https://maven.pkg.github.com/elastic/elasticsearch-java")
+            url = uri("https://rt.artifactory.tio.systems/artifactory/maven-knowledge-discovery-snapshots-virtual")
             credentials(PasswordCredentials::class)
         }
 
-        maven {
-            name = "Build"
-            url = uri("${rootProject.buildDir}/repository")
-        }
+//        maven {
+//            name = "Build"
+//            url = uri("${rootProject.buildDir}/repository")
+//        }
     }
 
     publications {
@@ -131,7 +147,7 @@ publishing {
             from(components["java"])
             pom {
                 name.set("Elasticsearch Java API Client")
-                artifactId = "elasticsearch-java"
+                artifactId = "elasticsearch-java-custom"
                 description.set("Elasticsearch Java API Client")
                 url.set("https://github.com/elastic/elasticsearch-java/")
                 licenses {
@@ -147,11 +163,11 @@ publishing {
                         inceptionYear.set("2020")
                     }
                 }
-                scm {
-                    connection.set("scm:git:https://github.com/elastic/elasticsearch-java.git")
-                    developerConnection.set("scm:git:ssh://git@github.com:elastic/elasticsearch-java.git")
-                    url.set("https://github.com/elastic/elasticsearch-java/")
-                }
+//                scm {
+//                    connection.set("scm:git:https://github.com/elastic/elasticsearch-java.git")
+//                    developerConnection.set("scm:git:ssh://git@github.com:elastic/elasticsearch-java.git")
+//                    url.set("https://github.com/elastic/elasticsearch-java/")
+//                }
 
                 withXml {
                     // Set the version of dependencies of the org.elasticsearch.client group to the one that we are building.
